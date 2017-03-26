@@ -59,7 +59,7 @@ magnitude common values are ".1","1"."10".
 Examples
 ----------------
 ```julia
-julia> `stemplot(rand(1:100,80))`
+julia> stemplot(rand(1:100,80))
 
      0 | 20304050607070808090
      1 | 1030303060607080
@@ -77,7 +77,7 @@ julia> `stemplot(rand(1:100,80))`
 ```
 
 ```julia
-julia> `stemplot(rand(-100:100,300))`
+julia> stemplot(rand(-100:100,300))
 
 
   -10 | 0
@@ -106,7 +106,7 @@ julia> `stemplot(rand(-100:100,300))`
 ```
 
 ```julia
-julia> `stemplot(randn(50),scale = 1)`
+julia> stemplot(randn(50),scale = 1)
      -2 | 00000
      -1 | 0000000
       0 | 00000000000000
