@@ -27,7 +27,7 @@ Usage
 ```
 function stemplot(
                   v::Vector,
-                  symbol::AbstractString,
+                  divider::AbstractString,
                   scale::Int64)
 ```
 
