@@ -1,6 +1,9 @@
 Stemplot
 =========
 
+[![Project Status: Active a The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/wip.svg)](http://www.repostatus.org/#wip)
+[![License](http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](LICENSE.md)
+
 Stemplots in Julia
 
 Installation
