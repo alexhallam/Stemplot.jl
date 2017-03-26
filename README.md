@@ -115,3 +115,17 @@ julia> stemplot(randn(50),scale = 1)
     Key: 1|0 = 1.0
     Description: The decimal is 0 digit(s) to the right of |
 ```
+
+And just for fun lets make the divider a `;)` emoji. 
+
+```julia
+julia> stemplot(randn(50),scale = 1, divider = ";)")
+
+   -2 ;) 1
+   -1 ;) 94441
+    0 ;) 8765443222111000
+    0 ;) 0011123333333445555667899
+    1 ;) 288
+
+  Description: The decimal is 0 digit(s) to the right of ;)
+```
