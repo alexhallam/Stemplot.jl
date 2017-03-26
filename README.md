@@ -23,20 +23,22 @@ Draws a stem leaf plot of the given vector `v`.
 Usage
 ----------------
 `stemplot(v)`
+
+```
 function stemplot(
                   v::Vector,
                   symbol::AbstractString,
                   scale::Int64)
+```
 
 Arguments
 ----------------
 -**`v`** : Vector for which the stem leaf plot should be computed
+
 -**`divider`**: Symbol for break between stem and leaf. Default = "|"
+
 -**`scale`**: Set scale of plot. Default = 10. Scale is changed via orders of
 magnitude common values are ".1","1"."10".
-
-Results
-----------------
 
 Examples
 ----------------
