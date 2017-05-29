@@ -58,7 +58,7 @@ function stemplot(v::AbstractVector;
   stems = num2hex.(stems); left_ints = num2hex.(left_ints)
 
   getlabel(s) = s == num2hex(-0.) ? "-0" : string(Int(hex2num(s)))
-  getleaf(stem) = sort(abs(trunc(Int, leaves[left_ints .== stem])))
+  getleaf(stem) = sort(abs.(trunc(Int, leaves[left_ints .== stem])))
 
   labels = getlabel.(stems)
   lbl_len = maximum(length.(labels))
@@ -73,7 +73,7 @@ function stemplot(v::AbstractVector;
 
   println("\nKey: 1$(divider)0 = $(scale)")
   # Description of where the decimal is
-  ndigits = abs(trunc(Int,log10(scale)))
+  ndigits = abs.(trunc(Int,log10(scale)))
   right_or_left = ifelse(trunc(Int,log10(scale)) < 0, "left", "right")
   println("The decimal is $(ndigits) digit(s) to the $(right_or_left) of $(divider)")
 end
