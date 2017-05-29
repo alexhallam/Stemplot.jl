@@ -52,7 +52,7 @@ function stemplot(v::AbstractVector;
   # Negative zeros => -0.00
   left_ints[indices(v, 1)[(left_ints .== 0) & (sign(leaves) .== -1)]] = -0.00
 
-  # Stem range => sorted hexidecimal
+  # Stem range => sorted hexadecimal
   stems= minimum(left_ints):maximum(left_ints)
   stems = sort(unique(vcat(stems, left_ints)))
   stems = num2hex.(stems); left_ints = num2hex.(left_ints)
