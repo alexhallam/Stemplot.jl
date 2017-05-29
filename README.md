@@ -129,3 +129,17 @@ julia> stemplot(randn(50),scale = 1, divider = ";)")
 
   Description: The decimal is 0 digit(s) to the right of ;)
 ```
+
+Or Julia's fancy emoji "smile" you can get by typing `\:smile` + `Tab`
+
+```
+julia> stemplot(randn(50),scale = 1, divider = "😄")
+-2 😄 0
+-1 😄 0000000000
+-0 😄 000000000000
+ 0 😄 000000000000000000000
+ 1 😄 000000
+
+Key: 1😄0 = 1
+The decimal is 0 digit(s) to the right of 😄
+```
