@@ -72,5 +72,8 @@ function stemplot(v::AbstractVector;
   end
 
   println("\nKey: 1$(divider)0 = $(scale)")
-
+  # Description of where the decimal is
+  ndigits = abs(trunc(Int,log10(scale)))
+  right_or_left = ifelse(trunc(Int,log10(scale)) < 0, "left", "right")
+  println("The decimal is $(ndigits) digit(s) to the $(right_or_left) of $(divider)")
 end
