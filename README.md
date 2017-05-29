@@ -132,7 +132,7 @@ julia> stemplot(randn(50),scale = 1, divider = ";)")
 
 Or Julia's fancy emoji "smile" you can get by typing `\:smile` + `Tab`
 
-```
+```julia
 julia> stemplot(randn(50),scale = 1, divider = "😄")
 -2 😄 0
 -1 😄 0000000000
