@@ -41,20 +41,23 @@ Usage
 `stemplot(v)`
 
 ```
-function stemplot(
-                  v::Vector,
-                  divider::AbstractString,
-                  scale::Int64)
+function stemplot(v::AbstractVector;
+                  scale=10,
+                  divider::AbstractString="|",
+                  padchar::AbstractString=" "
+                  )
 ```
 
 Arguments
 ----------------
 -**`v`** : Vector for which the stem leaf plot should be computed
 
--**`divider`**: Symbol for break between stem and leaf. Default = "|"
-
 -**`scale`**: Set scale of plot. Default = 10. Scale is changed via orders of
 magnitude common values are ".1","1"."10".
+
+-**`divider`**: Symbol for break between stem and leaf. Default = "|"
+
+-**`padchar`**: Character(s) to separate stems, leaves and dividers. Default = " "
 
 Examples
 ----------------
@@ -116,7 +119,7 @@ julia> stemplot(randn(50),scale = 1)
     Description: The decimal is 0 digit(s) to the right of |
 ```
 
-And just for fun lets make the divider a `;)` emoji. 
+And just for fun lets make the divider a `;)` emoji.
 
 ```julia
 julia> stemplot(randn(50),scale = 1, divider = ";)")
