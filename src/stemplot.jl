@@ -8,17 +8,19 @@ Usage
 `stemplot(v)`
 function stemplot(
                   v::Vector,
-                  symbol::AbstractString,
-                  scale::Int64)
+                  scale::Int64,
+                  divider::AbstractString,
+                  padchar::AbstractString)
 Arguments
 =========
 -**`v`** : Vector for which the stem leaf plot should be computed
--**`divider`**: Symbol for break between stem and leaf. Default = "|"
 -**`scale`**: Set scale of plot. Default = 10. Scale is changed via orders of magnitude common values are ".1","1"."10".
+-**`divider`**: Symbol for break between stem and leaf. Default = "|"
+-**`padchar`**: Character(s) to separate stems, leaves and dividers. Default = " "
 Results
 =======
 A plot of object type
-TODO
+
 Author(s)
 ========
 - Alex Hallam (Github: https://github.com/alexhallam)
@@ -50,7 +52,7 @@ function stemplot(v::AbstractVector;
   left_ints, leaves = divrem(v, scale)
 
   # Negative zeros => -0.00
-  left_ints[indices(v, 1)[(left_ints .== 0) .& (sign.(leaves) .== -1)]] = -0.00
+  left_ints[(left_ints .== 0) .& (sign.(leaves) .== -1)] = -0.00
 
   # Stem range => sorted hexadecimal
   stems= minimum(left_ints):maximum(left_ints)
@@ -71,6 +73,7 @@ function stemplot(v::AbstractVector;
     println(stem, divider, padchar, leaf)
   end
 
+  # Print key
   println("\nKey: 1$(divider)0 = $(scale)")
   # Description of where the decimal is
   ndigits = abs.(trunc.(Int,log10(scale)))
