@@ -119,20 +119,6 @@ julia> stemplot(randn(50),scale = 1)
     Description: The decimal is 0 digit(s) to the right of |
 ```
 
-And just for fun lets make the divider a `;)` emoji.
-
-```julia
-julia> stemplot(randn(50),scale = 1, divider = ";)")
-
-   -2 ;) 1
-   -1 ;) 94441
-    0 ;) 8765443222111000
-    0 ;) 0011123333333445555667899
-    1 ;) 288
-
-  Description: The decimal is 0 digit(s) to the right of ;)
-```
-
 Or Julia's fancy emoji "smile" you can get by typing `\:smile` + `Tab`
 
 ```julia
@@ -145,4 +131,19 @@ julia> stemplot(randn(50),scale = 1, divider = "😄")
 
 Key: 1😄0 = 1
 The decimal is 0 digit(s) to the right of 😄
+```
+TODO
+-------
+
+- [ ] Create type for stemplot so that it can be updated/refreshed with `stemplot!()`
+- [ ] Add `trim::Bool` parameter - round down by base *`scale`* to reduce digits
+- [ ] Create method for back-to-back stem plots which can be useful for comparing
+distributions:
+
+```julia
+julia> stemplot(dataset1, dataset2)
+ 99832 | 0 | 12339
+   210 | 1 | 0012334
+       | 2 | 89
+  6600 | 3 | 00136
 ```

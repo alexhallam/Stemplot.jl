@@ -4,7 +4,7 @@
 Description
 ============
 
-Draws a stem leaf plot of the given vector `v`.
+Draws a stem leaf plot of the vectors `v1` and `v2`.
 
 Usage
 ----------
@@ -19,7 +19,9 @@ function stemplot(
 Arguments
 ----------
 
--**`v`** : Vector for which the stem leaf plot should be computed
+-**`v1`** : Vector for which the stem leaf plot should be computed
+
+-**`v2`** : Vector for which the stem leaf plot should be computed
 
 -**`scale`**: Set scale of plot. Default = 10. Scale is changed via orders of magnitude common values are ".1","1"."10".
 
