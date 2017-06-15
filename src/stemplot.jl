@@ -1,3 +1,6 @@
+type
+
+
 """
 `stemplot(v; nargs...)`->` Plot`
 
@@ -59,7 +62,8 @@ stemplot(randn(50),scale = 1)
 function stemplot(v::AbstractVector;
                   scale=10,
                   divider::AbstractString="|",
-                  padchar::AbstractString=" "
+                  padchar::AbstractString=" ",
+                  trim::Bool=false,
                   )
   v = convert(Vector{AbstractFloat}, v)
 
@@ -70,8 +74,8 @@ function stemplot(v::AbstractVector;
   left_ints[(left_ints .== 0) .& (sign.(leaves) .== -1)] = -0.00
 
   # Stem range => sorted hexadecimal
-  stems= minimum(left_ints):maximum(left_ints)
-  stems = sort(unique(vcat(stems, left_ints)))
+  stemrng= minimum(left_ints):maximum(left_ints)
+  stems = trim ? sort(unique(left_ints)) : sort(unique(vcat(stemrng, left_ints)))
   stems = num2hex.(stems); left_ints = num2hex.(left_ints)
 
   getlabel(s) = s == num2hex(-0.) ? "-0" : string(Int(hex2num(s)))
