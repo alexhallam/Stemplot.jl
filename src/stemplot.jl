@@ -1,4 +1,12 @@
-type
+type Stemplot
+  left_ints::Vector{AbstractFloat}
+  leaves::Vector{AbstractFloat}
+
+  function Stemplot(left_ints::Vector{AbstractFloat},
+                    leaves::Vector{AbstractFloat})
+     new(left_ints, leaves)
+  end
+end
 
 
 """
@@ -59,12 +67,50 @@ stemplot(randn(50),scale = 1)
 ```
 
 """
+function stemplot(plt::Stemplot;
+                  scale=10,
+                  divider::AbstractString="|",
+                  padchar::AbstractString=" ",
+                  trim::Bool=false,
+                  )::Stemplot
+    getlabel(s) = s == num2hex(-0.) ? "-0" : string(Int(hex2num(s)))
+    getleaf(stem) = sort(abs.(trunc(Int, leaves[left_ints .== stem])))
+
+    left_ints = plt.left_ints
+    leaves = plt.leaves
+
+    # Stem range => sorted hexadecimal
+    stemrng= minimum(left_ints):maximum(left_ints)
+    stems = trim ? sort(unique(left_ints)) : sort(unique(vcat(stemrng, left_ints)))
+    stems = num2hex.(stems); left_ints = num2hex.(left_ints)
+
+    labels = getlabel.(stems)
+    lbl_len = maximum(length.(labels))
+    col_len = lbl_len + 1
+
+    # Stem | Leaf print routine
+    for i = 1:length(stems)
+      stem = rpad(lpad(labels[i], lbl_len, padchar), col_len, padchar)
+      leaf = join(string.(getleaf(stems[i])))
+      println(stem, divider, padchar, leaf)
+    end
+
+    # Print key
+    println("\nKey: 1$(divider)0 = $(scale)")
+    # Description of where the decimal is
+    ndigits = abs.(trunc(Int,log10(scale)))
+    right_or_left = ifelse(trunc(Int,log10(scale)) < 0, "left", "right")
+    println("The decimal is $(ndigits) digit(s) to the $(right_or_left) of $(divider)")
+
+end
+
+
 function stemplot(v::AbstractVector;
                   scale=10,
                   divider::AbstractString="|",
                   padchar::AbstractString=" ",
                   trim::Bool=false,
-                  )
+                  )::Stemplot
   v = convert(Vector{AbstractFloat}, v)
 
   # Initial Stems, Leaves
@@ -73,29 +119,18 @@ function stemplot(v::AbstractVector;
   # Negative zeros => -0.00
   left_ints[(left_ints .== 0) .& (sign.(leaves) .== -1)] = -0.00
 
-  # Stem range => sorted hexadecimal
-  stemrng= minimum(left_ints):maximum(left_ints)
-  stems = trim ? sort(unique(left_ints)) : sort(unique(vcat(stemrng, left_ints)))
-  stems = num2hex.(stems); left_ints = num2hex.(left_ints)
+  # Stemplot object
+  plt = Stemplot(left_ints, leaves)
 
-  getlabel(s) = s == num2hex(-0.) ? "-0" : string(Int(hex2num(s)))
-  getleaf(stem) = sort(abs.(trunc.(Int, leaves[left_ints .== stem])))
+  # Dispatch to plot routine
+  stemplot(plt, scale=scale, divider=divider, padchar=padchar, trim=trim)
 
-  labels = getlabel.(stems)
-  lbl_len = maximum(length.(labels))
-  col_len = lbl_len + 1
+end
 
-  # Stem | Leaf print routine
-  for i = 1:length(stems)
-    stem = rpad(lpad(labels[i], lbl_len, padchar), col_len, padchar)
-    leaf = join(string.(getleaf(stems[i])))
-    println(stem, divider, padchar, leaf)
-  end
+# back to back
+function stemplot()
+end
 
-  # Print key
-  println("\nKey: 1$(divider)0 = $(scale)")
-  # Description of where the decimal is
-  ndigits = abs.(trunc.(Int,log10(scale)))
-  right_or_left = ifelse(trunc.(Int,log10(scale)) < 0, "left", "right")
-  println("The decimal is $(ndigits) digit(s) to the $(right_or_left) of $(divider)")
+# mutating
+function stemplot!()
 end
