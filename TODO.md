@@ -1,7 +1,8 @@
 # TODO
 
-- [ ] Create type for stemplot so that it can be updated/refreshed with `stemplot!()`
-- [ ] Add `trim::Bool` parameter to limit output
+- ~~[ ] Create type for stemplot so that it can be updated/refreshed with `stemplot!()`~~
+  - Current structure doesn't have mutating parameters
+- [x] Add `trim::Bool` parameter to limit output
 - [ ] Add `precision::Bool` parameter to round output. Example:
 
 ```julia
@@ -32,7 +33,7 @@ julia> stemplot!(mystemplot, split=true)
  3 | 88
 ```
 
-- [ ] Create method for back-to-back stem plots which can be useful for comparing
+- [x] Create method for back-to-back stem plots which can be useful for comparing
 distributions:
 
 ```julia
@@ -42,3 +43,6 @@ julia> stemplot(dataset1, dataset2)
        | 2 | 89
   6600 | 3 | 00136
 ```
+
+- [ ] 0.6 proof everything
+- [ ] Update docs

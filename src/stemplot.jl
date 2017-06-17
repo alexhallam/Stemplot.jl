@@ -20,7 +20,7 @@ function getstems(left_ints::Vector{AbstractFloat}; trim::Bool=false)
 end
 
 stemplot_getlabel(s) = s == num2hex(-0.) ? "-0" : string(Int(hex2num(s)))
-stemplot_getleaf(s, l_i, lv) = sort(abs.(trunc(Int, lv[l_i .== s])))
+stemplot_getleaf(s, l_i, lv) = join(string.( sort(abs.(trunc(Int, lv[l_i .== s]))) ))
 
 """
 `stemplot(v; nargs...)`->` Plot`
@@ -98,7 +98,7 @@ function stemplot(plt::Stemplot, scale=10;
     # Stem | Leaf print routine
     for i = 1:length(stems)
       stem = rpad(lpad(labels[i], lbl_len, padchar), col_len, padchar)
-      leaf = join(string.(stemplot_getleaf(stems[i], left_ints, leaves)))
+      leaf = stemplot_getleaf(stems[i], left_ints, leaves)
       println(stem, divider, padchar, leaf)
     end
 
@@ -123,17 +123,22 @@ function stemplot(plt1::Stemplot, plt2::Stemplot, scale=10;
     leaves1 = plt1.leaves
     leaves2 = plt2.leaves
 
-    stems, left_ints = getstems(vcat(li_1, li_2), trim=trim)
+    stems1, li_1 = getstems(li_1, trim=trim)
+    stems2, li_2 = getstems(li_2, trim=trim)
+    stems = unique(vcat(stems1, stems2))
 
     labels = stemplot_getlabel.(stems)
     lbl_len = maximum(length.(labels))
     col_len = lbl_len + 1
 
     # Stem | Leaf print routine
+    left_leaves = [stemplot_getleaf(stems[i], li_1, leaves1) for i=1:length(stems)]
+    leftleaf_len = maximum(length.(left_leaves))
+
     for i = 1:length(stems)
-      left_leaf = ""
-      right_leaf = ""
-      stem = ""
+      left_leaf = lpad(reverse(left_leaves[i]), leftleaf_len, padchar)
+      right_leaf = stemplot_getleaf(stems[i], li_2, leaves2)
+      stem = rpad(lpad(labels[i], col_len, padchar), col_len+1, padchar)
       #stem = rpad(lpad(labels[i], lbl_len, padchar), col_len, padchar)
       #leaf = join(string.(stemplot_getleaf(stems[i], left_ints, leaves)))
       println(left_leaf, padchar, divider, stem, divider, padchar, right_leaf)
@@ -164,9 +169,5 @@ function stemplot(v1::AbstractVector, v2::AbstractVector, scale=10; args...)
   plt2 = Stemplot(v2, scale=scale)
 
   # Dispatch to plot routine
-  stemplot(plt1, pl2; args...)
-end
-
-# mutating
-function stemplot!()::Stemplot
+  stemplot(plt1, plt2; args...)
 end
