@@ -2,7 +2,7 @@ type Stemplot
   left_ints::Vector{AbstractFloat}
   leaves::Vector{AbstractFloat}
 
-  function Stemplot(v::AbstractVector)
+  function Stemplot(v::AbstractVector; scale=10)
     v = convert(Vector{AbstractFloat}, v)
     left_ints, leaves = divrem(v, scale)
     left_ints[(left_ints .== 0) .& (sign.(leaves) .== -1)] = -0.00
@@ -80,8 +80,7 @@ stemplot(randn(50),scale = 1)
 ```
 
 """
-function stemplot(plt::Stemplot;
-                  scale=10,
+function stemplot(plt::Stemplot, scale=10;
                   divider::AbstractString="|",
                   padchar::AbstractString=" ",
                   trim::Bool=false,
@@ -113,8 +112,7 @@ function stemplot(plt::Stemplot;
 end
 
 # back to back
-function stemplot(plt1::Stemplot, plt2::Stemplot;
-                  scale=10,
+function stemplot(plt1::Stemplot, plt2::Stemplot, scale=10;
                   divider::AbstractString="|",
                   padchar::AbstractString=" ",
                   trim::Bool=false,
@@ -151,19 +149,19 @@ function stemplot(plt1::Stemplot, plt2::Stemplot;
 end
 
 # Single
-function stemplot(v::AbstractVector; args...)
+function stemplot(v::AbstractVector, scale=10; args...)
   # Stemplot object
-  plt = Stemplot(v)
+  plt = Stemplot(v, scale=scale)
 
   # Dispatch to plot routine
   stemplot(plt; args...)
 end
 
 # Back to back
-function stemplot(v1::AbstractVector, v2::AbstractVector; args...)
+function stemplot(v1::AbstractVector, v2::AbstractVector, scale=10; args...)
   # Stemplot object
-  plt1 = Stemplot(v1)
-  plt2 = Stemplot(v2)
+  plt1 = Stemplot(v1, scale=scale)
+  plt2 = Stemplot(v2, scale=scale)
 
   # Dispatch to plot routine
   stemplot(plt1, pl2; args...)
