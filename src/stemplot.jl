@@ -120,14 +120,12 @@ function stemplot(plt1::Stemplot, plt2::Stemplot;
                   trim::Bool=false,
                   )
 
-    li_1 = plt1.left_ints
-    li_2 = plt2.left_ints
     leaves1 = plt1.leaves
     leaves2 = plt2.leaves
 
-    stems1, li_1 = getstems(li_1, trim=trim)
-    stems2, li_2 = getstems(li_2, trim=trim)
-    stems = unique(vcat(stems1, stems2))
+    stems1, li_1 = getstems(plt1.left_ints, trim=trim)
+    stems2, li_2 = getstems(plt2.left_ints, trim=trim)
+    stems, = getstems(vcat(plt1.left_ints, plt2.left_ints), trim=trim)
 
     labels = stemplot_getlabel.(stems)
     lbl_len = maximum(length.(labels))
