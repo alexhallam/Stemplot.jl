@@ -80,7 +80,8 @@ stemplot(randn(50),scale = 1)
 ```
 
 """
-function stemplot(plt::Stemplot, scale=10;
+function stemplot(plt::Stemplot;
+                  scale=10,
                   divider::AbstractString="|",
                   padchar::AbstractString=" ",
                   trim::Bool=false,
@@ -112,7 +113,8 @@ function stemplot(plt::Stemplot, scale=10;
 end
 
 # back to back
-function stemplot(plt1::Stemplot, plt2::Stemplot, scale=10;
+function stemplot(plt1::Stemplot, plt2::Stemplot;
+                  scale=10,
                   divider::AbstractString="|",
                   padchar::AbstractString=" ",
                   trim::Bool=false,
@@ -139,8 +141,6 @@ function stemplot(plt1::Stemplot, plt2::Stemplot, scale=10;
       left_leaf = lpad(reverse(left_leaves[i]), leftleaf_len, padchar)
       right_leaf = stemplot_getleaf(stems[i], li_2, leaves2)
       stem = rpad(lpad(labels[i], col_len, padchar), col_len+1, padchar)
-      #stem = rpad(lpad(labels[i], lbl_len, padchar), col_len, padchar)
-      #leaf = join(string.(stemplot_getleaf(stems[i], left_ints, leaves)))
       println(left_leaf, padchar, divider, stem, divider, padchar, right_leaf)
     end
 
@@ -154,20 +154,20 @@ function stemplot(plt1::Stemplot, plt2::Stemplot, scale=10;
 end
 
 # Single
-function stemplot(v::AbstractVector, scale=10; args...)
+function stemplot(v::AbstractVector; scale=10, args...)
   # Stemplot object
   plt = Stemplot(v, scale=scale)
 
   # Dispatch to plot routine
-  stemplot(plt; args...)
+  stemplot(plt; scale=scale, args...)
 end
 
 # Back to back
-function stemplot(v1::AbstractVector, v2::AbstractVector, scale=10; args...)
+function stemplot(v1::AbstractVector, v2::AbstractVector; scale=10, args...)
   # Stemplot object
   plt1 = Stemplot(v1, scale=scale)
   plt2 = Stemplot(v2, scale=scale)
 
   # Dispatch to plot routine
-  stemplot(plt1, plt2; args...)
+  stemplot(plt1, plt2; scale=scale, args...)
 end
