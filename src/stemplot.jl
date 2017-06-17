@@ -2,7 +2,7 @@ type Stemplot
   left_ints::Vector{AbstractFloat}
   leaves::Vector{AbstractFloat}
 
-  function Stemplot(v::AbstractVector; scale=10)
+  function Stemplot{T<:Real}(v::AbstractVector{T}; scale=10)
     v = convert(Vector{AbstractFloat}, v)
     left_ints, leaves = divrem(v, scale)
     left_ints[(left_ints .== 0) .& (sign.(leaves) .== -1)] = -0.00
@@ -154,7 +154,7 @@ function stemplot(plt1::Stemplot, plt2::Stemplot;
 end
 
 # Single
-function stemplot(v::AbstractVector; scale=10, args...)
+function stemplot{T<:Real}(v::AbstractVector{T}; scale=10, args...)
   # Stemplot object
   plt = Stemplot(v, scale=scale)
 
@@ -163,7 +163,7 @@ function stemplot(v::AbstractVector; scale=10, args...)
 end
 
 # Back to back
-function stemplot(v1::AbstractVector, v2::AbstractVector; scale=10, args...)
+function stemplot{T<:Real}(v1::AbstractVector{T}, v2::AbstractVector; scale=10, args...)
   # Stemplot object
   plt1 = Stemplot(v1, scale=scale)
   plt2 = Stemplot(v2, scale=scale)
