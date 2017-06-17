@@ -1,7 +1,20 @@
 # TODO
 
 - [ ] Create type for stemplot so that it can be updated/refreshed with `stemplot!()`
-- [ ] Add `trim::Bool` parameter - round down by base *`scale`* to reduce digits
+- [ ] Add `trim::Bool` parameter to limit output
+- [ ] Add `precision::Bool` parameter to round output. Example:
+
+```julia
+julia> v = [8,9,43,44]
+julia> stemplot(v, scale=100)
+0 | 894344
+
+# The 43 and 44 are misleading in this case, so
+# a precision parameter may be of use
+julia > stemplot(v, scale=100, precision=10)
+0 | 0044
+```
+
 - [ ] Add `split::Bool` parameter - break a stem across two or more lines if there's
 too many digits (or should this be `split::Int`, `maxdigits::Int`...?). For example:
 

@@ -2,12 +2,25 @@ type Stemplot
   left_ints::Vector{AbstractFloat}
   leaves::Vector{AbstractFloat}
 
-  function Stemplot(left_ints::Vector{AbstractFloat},
-                    leaves::Vector{AbstractFloat})
-     new(left_ints, leaves)
+  function Stemplot(v::AbstractVector)
+    v = convert(Vector{AbstractFloat}, v)
+    left_ints, leaves = divrem(v, scale)
+    left_ints[(left_ints .== 0) .& (sign.(leaves) .== -1)] = -0.00
+    new(left_ints, leaves)
   end
+
 end
 
+function getstems(left_ints::Vector{AbstractFloat}; trim::Bool=false)
+  # Stem range => sorted hexadecimal
+  stemrng= minimum(left_ints):maximum(left_ints)
+  stems = trim ? sort(unique(left_ints)) : sort(unique(vcat(stemrng, left_ints)))
+  stems = num2hex.(stems); left_ints = num2hex.(left_ints)
+  return stems, left_ints
+end
+
+stemplot_getlabel(s) = s == num2hex(-0.) ? "-0" : string(Int(hex2num(s)))
+stemplot_getleaf(s, l_i, lv) = sort(abs.(trunc(Int, lv[l_i .== s])))
 
 """
 `stemplot(v; nargs...)`->` Plot`
@@ -72,26 +85,21 @@ function stemplot(plt::Stemplot;
                   divider::AbstractString="|",
                   padchar::AbstractString=" ",
                   trim::Bool=false,
-                  )::Stemplot
-    getlabel(s) = s == num2hex(-0.) ? "-0" : string(Int(hex2num(s)))
-    getleaf(stem) = sort(abs.(trunc(Int, leaves[left_ints .== stem])))
+                  )
 
     left_ints = plt.left_ints
     leaves = plt.leaves
 
-    # Stem range => sorted hexadecimal
-    stemrng= minimum(left_ints):maximum(left_ints)
-    stems = trim ? sort(unique(left_ints)) : sort(unique(vcat(stemrng, left_ints)))
-    stems = num2hex.(stems); left_ints = num2hex.(left_ints)
+    stems, left_ints = getstems(left_ints, trim=trim)
 
-    labels = getlabel.(stems)
+    labels = stemplot_getlabel.(stems)
     lbl_len = maximum(length.(labels))
     col_len = lbl_len + 1
 
     # Stem | Leaf print routine
     for i = 1:length(stems)
       stem = rpad(lpad(labels[i], lbl_len, padchar), col_len, padchar)
-      leaf = join(string.(getleaf(stems[i])))
+      leaf = join(string.(stemplot_getleaf(stems[i], left_ints, leaves)))
       println(stem, divider, padchar, leaf)
     end
 
@@ -104,33 +112,63 @@ function stemplot(plt::Stemplot;
 
 end
 
-
-function stemplot(v::AbstractVector;
+# back to back
+function stemplot(plt1::Stemplot, plt2::Stemplot;
                   scale=10,
                   divider::AbstractString="|",
                   padchar::AbstractString=" ",
                   trim::Bool=false,
-                  )::Stemplot
-  v = convert(Vector{AbstractFloat}, v)
+                  )
 
-  # Initial Stems, Leaves
-  left_ints, leaves = divrem(v, scale)
+    li_1 = plt1.left_ints
+    li_2 = plt2.left_ints
+    leaves1 = plt1.leaves
+    leaves2 = plt2.leaves
 
-  # Negative zeros => -0.00
-  left_ints[(left_ints .== 0) .& (sign.(leaves) .== -1)] = -0.00
+    stems, left_ints = getstems(vcat(li_1, li_2), trim=trim)
 
-  # Stemplot object
-  plt = Stemplot(left_ints, leaves)
+    labels = stemplot_getlabel.(stems)
+    lbl_len = maximum(length.(labels))
+    col_len = lbl_len + 1
 
-  # Dispatch to plot routine
-  stemplot(plt, scale=scale, divider=divider, padchar=padchar, trim=trim)
+    # Stem | Leaf print routine
+    for i = 1:length(stems)
+      left_leaf = ""
+      right_leaf = ""
+      stem = ""
+      #stem = rpad(lpad(labels[i], lbl_len, padchar), col_len, padchar)
+      #leaf = join(string.(stemplot_getleaf(stems[i], left_ints, leaves)))
+      println(left_leaf, padchar, divider, stem, divider, padchar, right_leaf)
+    end
+
+    # Print key
+    println("\nKey: 1$(divider)0 = $(scale)")
+    # Description of where the decimal is
+    ndigits = abs.(trunc(Int,log10(scale)))
+    right_or_left = ifelse(trunc(Int,log10(scale)) < 0, "left", "right")
+    println("The decimal is $(ndigits) digit(s) to the $(right_or_left) of $(divider)")
 
 end
 
-# back to back
-function stemplot()
+# Single
+function stemplot(v::AbstractVector; args...)
+  # Stemplot object
+  plt = Stemplot(v)
+
+  # Dispatch to plot routine
+  stemplot(plt; args...)
+end
+
+# Back to back
+function stemplot(v1::AbstractVector, v2::AbstractVector; args...)
+  # Stemplot object
+  plt1 = Stemplot(v1)
+  plt2 = Stemplot(v2)
+
+  # Dispatch to plot routine
+  stemplot(plt1, pl2; args...)
 end
 
 # mutating
-function stemplot!()
+function stemplot!()::Stemplot
 end
