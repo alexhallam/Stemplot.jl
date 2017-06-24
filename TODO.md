@@ -58,7 +58,12 @@ julia> stemplot(dataset1, dataset2)
 ```
 - [x] Remove repeated code for legend between single and B2B - this can be a separate function
 - [ ] 0.6 proof everything
+- [ ] ensure the `where T<:Real` works, and that no strange behavior is occuring across the various parameters
 - [ ] Update docs
-- [ ] add tests
+- [x] add tests
+- [ ] make components of the legend toggle-able
+- [ ] make indentation consistent
+- [ ] ensure we're good with the trim kwarg as trim and not trunc - i accidentally used the former despite the issue discussion
 - [ ] move into a fork of UnicodePlots
   - Remember to remove TODO, include README into forked version
+  - Get Christopher Stocker's input on general API, decision to use some abstract types for string and float

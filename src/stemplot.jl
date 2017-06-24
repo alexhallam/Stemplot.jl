@@ -1,10 +1,30 @@
-struct Stemplot
-  left_ints::Vector{AbstractFloat}
-  leaves::Vector{AbstractFloat}
+# Author(s)
+# ----------
+# - Alex Hallam (Github: https://github.com/alexhallam)\n
+# - Matthew Amos (Github: https://github.com/equinetic)
 
-  function Stemplot(v::AbstractVector{T} where T<:Real;
-                    scale=10,
-                    precision=1)
+
+"""
+```julia
+Stemplot(v::AbstractVector{T} where T<:Real;
+                  scale=10,
+                  precision=1)
+```
+
+`v` = vector of real numbers\n
+`scale` = base of the stems, default 10\n
+`precision` = scale of the leaves, default 1 (no rounding)
+
+{example plots}
+
+"""
+struct Stemplot
+  left_ints::AbstractVector{AbstractFloat}
+  leaves::AbstractVector{AbstractFloat}
+
+  function Stemplot(v::AbstractVector{T};
+                    scale::T=10,
+                    precision::T=1 where T<:Real)
     v = convert(Vector{AbstractFloat}, v)
     left_ints, leaves = divrem(v, scale)
     leaves = trunc(Int, round(leaves/precision, 0))
@@ -30,34 +50,36 @@ stemplot_getleaf(s, l_i, lv) = join(string.( sort(abs.(trunc(Int, lv[l_i .== s])
 
 Description
 ============
-Draws a stem leaf plot of the given vector `v`.
+Draws a stem leaf plot of the given vector `v` or a back-to-back
+stem and leaf plot of vectors `v1` and `v2`.
 
 Usage
 ----------
 ```julia
-`stemplot(v)`
-function stemplot(
-                  v::Vector,
-                  scale::Int64,
-                  divider::AbstractString,
-                  padchar::AbstractString)
+stemplot(v::Vector,
+  scale::Real,
+  precision::Real,
+  divider::AbstractString,
+  padchar::AbstractString,
+  trim::Bool)
+
+stemplot(v1::Vector, v2::Vector)
+
 ```
 Arguments
 ----------
--**`v`** : Vector for which the stem leaf plot should be computed\n
+-**`v`; `v1, v2`**: Vector(s) for which the stem leaf plot should be computed\n
 -**`scale`**: Set scale of plot. Default = 10. Scale is changed via
 orders of magnitude common values are ".1","1"."10".\n
+-**`precision`**: Set precision of plot, defaults to 1. This will reduce the
+number of digits in the leaves.\n
 -**`divider`**: Symbol for break between stem and leaf. Default = "|"\n
 -**`padchar`**: Character(s) to separate stems, leaves and dividers. Default = " "\n
+-**`trim`**: Remove stems that do not contain any leaves.
 
 Results
 ----------
-A plot of object type
-
-Author(s)
-----------
-- Alex Hallam (Github: https://github.com/alexhallam)\n
-- Matthew Amos (Github: https://github.com/equinetic)
+A plot of object type Stemplot
 
 Examples
 ----------
@@ -76,12 +98,13 @@ stemplot(randn(50),scale = 1)
 
 """
 function stemplot(plt::Stemplot;
-                  scale=10,
-                  precision=1,
+                  scale::T=10,
+                  precision::T=1,
                   divider::AbstractString="|",
                   padchar::AbstractString=" ",
                   trim::Bool=false,
-                  )
+                  args...
+                  where T<:Real)
 
     left_ints = plt.left_ints
     leaves = plt.leaves
@@ -100,18 +123,19 @@ function stemplot(plt::Stemplot;
     end
 
     # Print key
-    stemplotlegend(scale=scale, precision=precision, divider=divider)
+    stemplotlegend(scale=scale, precision=precision, divider=divider, args...)
 
 end
 
 # back to back
 function stemplot(plt1::Stemplot, plt2::Stemplot;
-                  scale=10,
-                  precision=1,
+                  scale::T=10,
+                  precision::T=1,
                   divider::AbstractString="|",
                   padchar::AbstractString=" ",
                   trim::Bool=false,
-                  )
+                  args...
+                  where T<:Real)
 
     leaves1 = plt1.leaves
     leaves2 = plt2.leaves
@@ -136,24 +160,35 @@ function stemplot(plt1::Stemplot, plt2::Stemplot;
     end
 
     # Print key
-    stemplotlegend(scale=scale, precision=precision, divider=divider)
+    stemplotlegend(scale=scale, precision=precision, divider=divider, args...)
 end
 
-function stemplotlegend(;scale=10,
-                  precision=1,
-                  divider::AbstractString="|",)
-  println("\nKey: 1$(divider)0 = $(scale)")
-  # Description of where the decimal is
-  ndigits = abs.(trunc(Int,log10(scale)))
-  right_or_left = ifelse(trunc(Int,log10(scale)) < 0, "left", "right")
-  println("The decimal is $(ndigits) digit(s) to the $(right_or_left) of $(divider)")
-  if precision != 1
+# Prints legend at the end of the plot
+function stemplotlegend(;scale::T=10,
+                  precision::T=1,
+                  divider::AbstractString="|",
+                  printscale=true,
+                  printdecloc=true,
+                  printprecision=true where T<:Real)
+  if printscale
+    println("\nKey: 1$(divider)0 = $(scale)")
+  end
+
+  if printdecloc
+    ndigits = abs.(trunc(Int,log10(scale)))
+    right_or_left = ifelse(trunc(Int,log10(scale)) < 0, "left", "right")
+    println("The decimal is $(ndigits) digit(s) to the $(right_or_left) of $(divider)")
+  end
+
+  if printprecision && precision != 1
     println("Leaves rounded to the nearest $(precision)")
   end
+  
 end
 
-# Single
-function stemplot(v::AbstractVector{T} where T<:Real; scale=10, args...)
+# Normal stem plot
+function stemplot(v::AbstractVector{T};
+                  scale::T=10, args... where T<:Real)
   # Stemplot object
   plt = Stemplot(v, scale=scale)
 
@@ -161,8 +196,9 @@ function stemplot(v::AbstractVector{T} where T<:Real; scale=10, args...)
   stemplot(plt; scale=scale, args...)
 end
 
-# Back to back
-function stemplot(v1::AbstractVector{T}, v2::AbstractVector where T<:Real; scale=10, args...)
+# Back to back plot
+function stemplot(v1::AbstractVector{T}, v2::AbstractVector{T};
+                  scale=10, args... where T<:Real)
   # Stemplot object
   plt1 = Stemplot(v1, scale=scale)
   plt2 = Stemplot(v2, scale=scale)
