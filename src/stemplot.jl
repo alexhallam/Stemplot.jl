@@ -1,10 +1,13 @@
-type Stemplot
+struct Stemplot
   left_ints::Vector{AbstractFloat}
   leaves::Vector{AbstractFloat}
 
-  function Stemplot{T<:Real}(v::AbstractVector{T}; scale=10)
+  function Stemplot(v::AbstractVector{T} where T<:Real;
+                    scale=10,
+                    precision=1)
     v = convert(Vector{AbstractFloat}, v)
     left_ints, leaves = divrem(v, scale)
+    leaves = trunc(Int, round(leaves/precision, 0))
     left_ints[(left_ints .== 0) .& (sign.(leaves) .== -1)] = -0.00
     new(left_ints, leaves)
   end
@@ -27,7 +30,6 @@ stemplot_getleaf(s, l_i, lv) = join(string.( sort(abs.(trunc(Int, lv[l_i .== s])
 
 Description
 ============
-
 Draws a stem leaf plot of the given vector `v`.
 
 Usage
@@ -42,31 +44,24 @@ function stemplot(
 ```
 Arguments
 ----------
-
--**`v`** : Vector for which the stem leaf plot should be computed
-
--**`scale`**: Set scale of plot. Default = 10. Scale is changed via orders of magnitude common values are ".1","1"."10".
-
--**`divider`**: Symbol for break between stem and leaf. Default = "|"
-
--**`padchar`**: Character(s) to separate stems, leaves and dividers. Default = " "
+-**`v`** : Vector for which the stem leaf plot should be computed\n
+-**`scale`**: Set scale of plot. Default = 10. Scale is changed via
+orders of magnitude common values are ".1","1"."10".\n
+-**`divider`**: Symbol for break between stem and leaf. Default = "|"\n
+-**`padchar`**: Character(s) to separate stems, leaves and dividers. Default = " "\n
 
 Results
 ----------
-
 A plot of object type
 
 Author(s)
 ----------
-
-- Alex Hallam (Github: https://github.com/alexhallam)
-
+- Alex Hallam (Github: https://github.com/alexhallam)\n
 - Matthew Amos (Github: https://github.com/equinetic)
 
 Examples
 ----------
 ```julia
-
 stemplot(rand(1:100,80))
 stemplot(rand(-100:100,300))
 stemplot(randn(50),scale = 1)
@@ -82,6 +77,7 @@ stemplot(randn(50),scale = 1)
 """
 function stemplot(plt::Stemplot;
                   scale=10,
+                  precision=1,
                   divider::AbstractString="|",
                   padchar::AbstractString=" ",
                   trim::Bool=false,
@@ -104,17 +100,14 @@ function stemplot(plt::Stemplot;
     end
 
     # Print key
-    println("\nKey: 1$(divider)0 = $(scale)")
-    # Description of where the decimal is
-    ndigits = abs.(trunc(Int,log10(scale)))
-    right_or_left = ifelse(trunc(Int,log10(scale)) < 0, "left", "right")
-    println("The decimal is $(ndigits) digit(s) to the $(right_or_left) of $(divider)")
+    stemplotlegend(scale=scale, precision=precision, divider=divider)
 
 end
 
 # back to back
 function stemplot(plt1::Stemplot, plt2::Stemplot;
                   scale=10,
+                  precision=1,
                   divider::AbstractString="|",
                   padchar::AbstractString=" ",
                   trim::Bool=false,
@@ -143,16 +136,24 @@ function stemplot(plt1::Stemplot, plt2::Stemplot;
     end
 
     # Print key
-    println("\nKey: 1$(divider)0 = $(scale)")
-    # Description of where the decimal is
-    ndigits = abs.(trunc(Int,log10(scale)))
-    right_or_left = ifelse(trunc(Int,log10(scale)) < 0, "left", "right")
-    println("The decimal is $(ndigits) digit(s) to the $(right_or_left) of $(divider)")
+    stemplotlegend(scale=scale, precision=precision, divider=divider)
+end
 
+function stemplotlegend(;scale=10,
+                  precision=1,
+                  divider::AbstractString="|",)
+  println("\nKey: 1$(divider)0 = $(scale)")
+  # Description of where the decimal is
+  ndigits = abs.(trunc(Int,log10(scale)))
+  right_or_left = ifelse(trunc(Int,log10(scale)) < 0, "left", "right")
+  println("The decimal is $(ndigits) digit(s) to the $(right_or_left) of $(divider)")
+  if precision != 1
+    println("Leaves rounded to the nearest $(precision)")
+  end
 end
 
 # Single
-function stemplot{T<:Real}(v::AbstractVector{T}; scale=10, args...)
+function stemplot(v::AbstractVector{T} where T<:Real; scale=10, args...)
   # Stemplot object
   plt = Stemplot(v, scale=scale)
 
@@ -161,7 +162,7 @@ function stemplot{T<:Real}(v::AbstractVector{T}; scale=10, args...)
 end
 
 # Back to back
-function stemplot{T<:Real}(v1::AbstractVector{T}, v2::AbstractVector; scale=10, args...)
+function stemplot(v1::AbstractVector{T}, v2::AbstractVector where T<:Real; scale=10, args...)
   # Stemplot object
   plt1 = Stemplot(v1, scale=scale)
   plt2 = Stemplot(v2, scale=scale)
