@@ -8,7 +8,8 @@
 ```julia
 Stemplot(v::AbstractVector{T} where T<:Real;
                   scale=10,
-                  precision=1)
+                  precision=NaN  # Defaults to scale/10
+        )
 ```
 
 `v` = vector of real numbers\n
@@ -22,10 +23,11 @@ struct Stemplot
 
   function Stemplot(v::AbstractVector{T} where T <: Real;
                     scale=10,
-                    precision=1, args...)
+                    precision=NaN, args...)
     v = convert(Vector{AbstractFloat}, v)
     divop = divrem.(v, scale)
     left_ints = [x[1] for x in divop]
+    precision = isnan(precision) ? scale/10 : precision
     leaves = trunc.(Int, round.([x[2] for x in divop]/precision, 0))
     left_ints[(left_ints .== 0) .& (sign.(leaves) .== -1)] = -0.00
     new(left_ints, leaves)
@@ -98,7 +100,7 @@ stemplot(randn(50),scale = 1)
 """
 function stemplot(plt::Stemplot;
                   scale=10,
-                  precision=1,
+                  precision=NaN,
                   divider::AbstractString="|",
                   padchar::AbstractString=" ",
                   trim::Bool=false,
@@ -127,7 +129,7 @@ end
 # back to back
 function stemplot(plt1::Stemplot, plt2::Stemplot;
                   scale=10,
-                  precision=1,
+                  precision=NaN,
                   divider::AbstractString="|",
                   padchar::AbstractString=" ",
                   trim::Bool=false,
@@ -161,7 +163,7 @@ end
 
 # Prints legend at the end of the plot
 function stemplotlegend(;scale=10,
-                  precision=1,
+                  precision=NaN,
                   divider::AbstractString="|",
                   printscale=true,
                   printdecloc=true,
@@ -176,9 +178,8 @@ function stemplotlegend(;scale=10,
     println("The decimal is $(ndigits) digit(s) to the $(right_or_left) of $(divider)")
   end
 
-  if printprecision && precision != 1
-    suffix = get(Dict('1'=>"st",'2'=>"nd",'3'=>"rd"), string(precision)[end],"th")
-    println("Leaves are rounded to the nearest $(precision)$(suffix)")
+  if printprecision && !isnan(precision)
+    println("Leaves are rounded to the nearest $(precision)")
   end
 
 end
