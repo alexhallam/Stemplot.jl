@@ -15,19 +15,18 @@ Stemplot(v::AbstractVector{T} where T<:Real;
 `scale` = base of the stems, default 10\n
 `precision` = scale of the leaves, default 1 (no rounding)
 
-{example plots}
-
 """
 struct Stemplot
   left_ints::AbstractVector{AbstractFloat}
   leaves::AbstractVector{AbstractFloat}
 
-  function Stemplot(v::AbstractVector{T};
-                    scale::T=10,
-                    precision::T=1 where T<:Real)
+  function Stemplot(v::AbstractVector{T} where T <: Real;
+                    scale=10,
+                    precision=1)
     v = convert(Vector{AbstractFloat}, v)
-    left_ints, leaves = divrem(v, scale)
-    leaves = trunc(Int, round(leaves/precision, 0))
+    divop = divrem.(v, scale)
+    left_ints = [x[1] for x in divop]
+    leaves = trunc.(Int, round.([x[2] for x in divop]/precision, 0))
     left_ints[(left_ints .== 0) .& (sign.(leaves) .== -1)] = -0.00
     new(left_ints, leaves)
   end
@@ -43,7 +42,7 @@ function getstems(left_ints::Vector{AbstractFloat}; trim::Bool=false)
 end
 
 stemplot_getlabel(s) = s == num2hex(-0.) ? "-0" : string(Int(hex2num(s)))
-stemplot_getleaf(s, l_i, lv) = join(string.( sort(abs.(trunc(Int, lv[l_i .== s]))) ))
+stemplot_getleaf(s, l_i, lv) = join(string.( sort(abs.(trunc.(Int, lv[l_i .== s]))) ))
 
 """
 `stemplot(v; nargs...)`->` Plot`
@@ -98,13 +97,12 @@ stemplot(randn(50),scale = 1)
 
 """
 function stemplot(plt::Stemplot;
-                  scale::T=10,
-                  precision::T=1,
+                  scale=10,
+                  precision=1,
                   divider::AbstractString="|",
                   padchar::AbstractString=" ",
                   trim::Bool=false,
-                  args...
-                  where T<:Real)
+                  args...)
 
     left_ints = plt.left_ints
     leaves = plt.leaves
@@ -124,32 +122,30 @@ function stemplot(plt::Stemplot;
 
     # Print key
     stemplotlegend(scale=scale, precision=precision, divider=divider, args...)
-
 end
 
 # back to back
 function stemplot(plt1::Stemplot, plt2::Stemplot;
-                  scale::T=10,
-                  precision::T=1,
+                  scale=10,
+                  precision=1,
                   divider::AbstractString="|",
                   padchar::AbstractString=" ",
                   trim::Bool=false,
-                  args...
-                  where T<:Real)
+                  args...)
 
     leaves1 = plt1.leaves
     leaves2 = plt2.leaves
 
-    stems1, li_1 = getstems(plt1.left_ints, trim=trim)
-    stems2, li_2 = getstems(plt2.left_ints, trim=trim)
-    stems, = getstems(vcat(plt1.left_ints, plt2.left_ints), trim=trim)
+    _, li_1  = getstems(plt1.left_ints, trim=trim)
+    _, li_2  = getstems(plt2.left_ints, trim=trim)
+    stems, _ = getstems(vcat(plt1.left_ints, plt2.left_ints), trim=trim)
 
     labels = stemplot_getlabel.(stems)
     lbl_len = maximum(length.(labels))
     col_len = lbl_len + 1
 
     # Stem | Leaf print routine
-    left_leaves = [stemplot_getleaf(stems[i], li_1, leaves1) for i=1:length(stems)]
+    left_leaves = [stemplot_getleaf(stems[i],li_1,leaves1) for i=1:length(stems)]
     leftleaf_len = maximum(length.(left_leaves))
 
     for i = 1:length(stems)
@@ -164,12 +160,12 @@ function stemplot(plt1::Stemplot, plt2::Stemplot;
 end
 
 # Prints legend at the end of the plot
-function stemplotlegend(;scale::T=10,
-                  precision::T=1,
+function stemplotlegend(;scale=10,
+                  precision=1,
                   divider::AbstractString="|",
                   printscale=true,
                   printdecloc=true,
-                  printprecision=true where T<:Real)
+                  printprecision=true)
   if printscale
     println("\nKey: 1$(divider)0 = $(scale)")
   end
@@ -181,28 +177,30 @@ function stemplotlegend(;scale::T=10,
   end
 
   if printprecision && precision != 1
-    println("Leaves rounded to the nearest $(precision)")
+    suffix = get(Dict('1'=>"st",'2'=>"nd",'3'=>"rd"), string(precision)[end],"th")
+    println("Leaves are rounded to the nearest $(precision)$(suffix)")
   end
-  
+
 end
 
 # Normal stem plot
-function stemplot(v::AbstractVector{T};
-                  scale::T=10, args... where T<:Real)
+function stemplot(v::AbstractVector{T} where T<:Real;
+                  scale=10, precision=1, args...)
   # Stemplot object
-  plt = Stemplot(v, scale=scale)
+  plt = Stemplot(v, scale=scale, precision=precision)
 
   # Dispatch to plot routine
-  stemplot(plt; scale=scale, args...)
+  stemplot(plt; scale=scale, precision=precision, args...)
 end
 
 # Back to back plot
-function stemplot(v1::AbstractVector{T}, v2::AbstractVector{T};
-                  scale=10, args... where T<:Real)
+function stemplot(v1::AbstractVector{A} where A<:Real,
+                  v2::AbstractVector{B} where B<:Real;
+                  scale=10, precision=1, args...)
   # Stemplot object
-  plt1 = Stemplot(v1, scale=scale)
-  plt2 = Stemplot(v2, scale=scale)
+  plt1 = Stemplot(v1, scale=scale, precision=precision)
+  plt2 = Stemplot(v2, scale=scale, precision=precision)
 
   # Dispatch to plot routine
-  stemplot(plt1, plt2; scale=scale, args...)
+  stemplot(plt1, plt2; scale=scale, precision=precision, args...)
 end
