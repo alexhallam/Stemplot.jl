@@ -22,7 +22,7 @@ struct Stemplot
 
   function Stemplot(v::AbstractVector{T} where T <: Real;
                     scale=10,
-                    precision=1)
+                    precision=1, args...)
     v = convert(Vector{AbstractFloat}, v)
     divop = divrem.(v, scale)
     left_ints = [x[1] for x in divop]
@@ -104,24 +104,24 @@ function stemplot(plt::Stemplot;
                   trim::Bool=false,
                   args...)
 
-    left_ints = plt.left_ints
-    leaves = plt.leaves
+  left_ints = plt.left_ints
+  leaves = plt.leaves
 
-    stems, left_ints = getstems(left_ints, trim=trim)
+  stems, left_ints = getstems(left_ints, trim=trim)
 
-    labels = stemplot_getlabel.(stems)
-    lbl_len = maximum(length.(labels))
-    col_len = lbl_len + 1
+  labels = stemplot_getlabel.(stems)
+  lbl_len = maximum(length.(labels))
+  col_len = lbl_len + 1
 
-    # Stem | Leaf print routine
-    for i = 1:length(stems)
-      stem = rpad(lpad(labels[i], lbl_len, padchar), col_len, padchar)
-      leaf = stemplot_getleaf(stems[i], left_ints, leaves)
-      println(stem, divider, padchar, leaf)
-    end
+  # Stem | Leaf print routine
+  for i = 1:length(stems)
+    stem = rpad(lpad(labels[i], lbl_len, padchar), col_len, padchar)
+    leaf = stemplot_getleaf(stems[i], left_ints, leaves)
+    println(stem, divider, padchar, leaf)
+  end
 
-    # Print key
-    stemplotlegend(scale=scale, precision=precision, divider=divider, args...)
+  # Print key
+  stemplotlegend(scale=scale, precision=precision, divider=divider, args...)
 end
 
 # back to back
@@ -133,30 +133,30 @@ function stemplot(plt1::Stemplot, plt2::Stemplot;
                   trim::Bool=false,
                   args...)
 
-    leaves1 = plt1.leaves
-    leaves2 = plt2.leaves
+  leaves1 = plt1.leaves
+  leaves2 = plt2.leaves
 
-    _, li_1  = getstems(plt1.left_ints, trim=trim)
-    _, li_2  = getstems(plt2.left_ints, trim=trim)
-    stems, _ = getstems(vcat(plt1.left_ints, plt2.left_ints), trim=trim)
+  _, li_1  = getstems(plt1.left_ints, trim=trim)
+  _, li_2  = getstems(plt2.left_ints, trim=trim)
+  stems, _ = getstems(vcat(plt1.left_ints, plt2.left_ints), trim=trim)
 
-    labels = stemplot_getlabel.(stems)
-    lbl_len = maximum(length.(labels))
-    col_len = lbl_len + 1
+  labels = stemplot_getlabel.(stems)
+  lbl_len = maximum(length.(labels))
+  col_len = lbl_len + 1
 
-    # Stem | Leaf print routine
-    left_leaves = [stemplot_getleaf(stems[i],li_1,leaves1) for i=1:length(stems)]
-    leftleaf_len = maximum(length.(left_leaves))
+  # Stem | Leaf print routine
+  left_leaves = [stemplot_getleaf(stems[i],li_1,leaves1) for i=1:length(stems)]
+  leftleaf_len = maximum(length.(left_leaves))
 
-    for i = 1:length(stems)
-      left_leaf = lpad(reverse(left_leaves[i]), leftleaf_len, padchar)
-      right_leaf = stemplot_getleaf(stems[i], li_2, leaves2)
-      stem = rpad(lpad(labels[i], col_len, padchar), col_len+1, padchar)
-      println(left_leaf, padchar, divider, stem, divider, padchar, right_leaf)
-    end
+  for i = 1:length(stems)
+    left_leaf = lpad(reverse(left_leaves[i]), leftleaf_len, padchar)
+    right_leaf = stemplot_getleaf(stems[i], li_2, leaves2)
+    stem = rpad(lpad(labels[i], col_len, padchar), col_len+1, padchar)
+    println(left_leaf, padchar, divider, stem, divider, padchar, right_leaf)
+  end
 
-    # Print key
-    stemplotlegend(scale=scale, precision=precision, divider=divider, args...)
+  # Print key
+  stemplotlegend(scale=scale, precision=precision, divider=divider, args...)
 end
 
 # Prints legend at the end of the plot
@@ -165,7 +165,7 @@ function stemplotlegend(;scale=10,
                   divider::AbstractString="|",
                   printscale=true,
                   printdecloc=true,
-                  printprecision=true)
+                  printprecision=true, args...)
   if printscale
     println("\nKey: 1$(divider)0 = $(scale)")
   end
@@ -184,23 +184,19 @@ function stemplotlegend(;scale=10,
 end
 
 # Normal stem plot
-function stemplot(v::AbstractVector{T} where T<:Real;
-                  scale=10, precision=1, args...)
-  # Stemplot object
-  plt = Stemplot(v, scale=scale, precision=precision)
-
-  # Dispatch to plot routine
-  stemplot(plt; scale=scale, precision=precision, args...)
+function stemplot(v::AbstractVector{T} where T<:Real; args...)
+  plt = Stemplot(v; args...)
+  stemplot(plt; args...)
 end
 
 # Back to back plot
 function stemplot(v1::AbstractVector{A} where A<:Real,
                   v2::AbstractVector{B} where B<:Real;
-                  scale=10, precision=1, args...)
+                  args...)
   # Stemplot object
-  plt1 = Stemplot(v1, scale=scale, precision=precision)
-  plt2 = Stemplot(v2, scale=scale, precision=precision)
+  plt1 = Stemplot(v1; args...)
+  plt2 = Stemplot(v2; args...)
 
   # Dispatch to plot routine
-  stemplot(plt1, plt2; scale=scale, precision=precision, args...)
+  stemplot(plt1, plt2; args...)
 end

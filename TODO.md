@@ -57,12 +57,13 @@ julia> stemplot(dataset1, dataset2)
   6600 | 3 | 00136
 ```
 - [x] Remove repeated code for legend between single and B2B - this can be a separate function
-- [ ] 0.6 proof everything
-- [ ] ensure the `where T<:Real` works, and that no strange behavior is occuring across the various parameters
-- [ ] Update docs
+- [x] 0.6 proof everything
+- [x] ensure the `where T<:Real` works, and that no strange behavior is occuring across the various parameters
+- [x] Update docs
 - [x] add tests
-- [ ] make components of the legend toggle-able
-- [ ] make indentation consistent
+- [x] make components of the legend toggle-able
+- [x] clean up these arguments, it's a little confusing to follow the bouncing ball
+- [x] make indentation consistent
 - [ ] ensure we're good with the trim kwarg as trim and not trunc - i accidentally used the former despite the issue discussion
 - [ ] move into a fork of UnicodePlots
   - Remember to remove TODO, include README into forked version
